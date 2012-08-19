@@ -84,6 +84,8 @@ sub printViews {
 sub printView {
     my ($class, $view) = @_;
 
+# TODO : missing output column?
+
     my $table = [ [ "Name", "State", "Down", "Warning", "Critical" ] ];
     foreach my $host (@$view) {
         foreach my $service (@{$host->{'services'}}) {
@@ -93,6 +95,43 @@ sub printView {
                 $service->{'name'},
                 $service->{'state'},
                 $service->{'unhandled'} ? 'unhandled' : 'handled',
+                $service->{'output'},
+            ];
+        }
+    }
+
+    _printTable($table);
+}
+
+sub printHosts {
+    my ($class, $hosts) = @_;
+
+    my $table = [ [ "Name", "Alias", "State", "Ok", "Warning", "Critical" ] ];
+    foreach my $host (@$hosts) {
+        push @$table, [
+            $host->{'name'},
+            $host->{'alias'},
+            $host->{'state'},
+            $host->{'summary'}->{'ok'}->{'handled'} || 0,
+            _format($host->{'summary'}->{'warning'}),
+            _format($host->{'summary'}->{'critical'})
+        ];
+    }
+
+    _printTable($table);
+}
+
+sub printServices {
+    my ($class, $hosts) = @_;
+
+    my $table = [ [ "Host", "Name", "State", "Unhandled", "Output" ] ];
+    foreach my $host (@$hosts) {
+        foreach my $service (@{$host->{'services'}}) {
+            push @$table, [
+                $host->{'name'},
+                $service->{'name'},
+                $service->{'state'},
+                $service->{'unhandled'} || 0,
                 $service->{'output'},
             ];
         }

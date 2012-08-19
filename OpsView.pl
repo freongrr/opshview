@@ -8,7 +8,7 @@ require OpsView::Connector;
 require OpsView::Commands;
 require OpsView::Printer;
 
-use constant COMMANDS => qw(token get hostgroup viewport);
+use constant COMMANDS => qw(token get hostgroup viewport host service);
 
 use constant DEFAULT_URL => "http://opsview";
 
@@ -67,16 +67,12 @@ sub main {
     # TODO : break that out somehow
     if ($command eq 'token') {
         print $connector->token."\n";
-    } 
-    # Goes straight to OpsView
-    elsif ($command eq 'get') {
+    } elsif ($command eq 'get') {
         my $path = $arguments[0];
         print "GET $path\n";
         my $response = $connector->request($path);
         OpsView::Printer->prettyPrint($response);
-    }
-    # Viewport
-    elsif ($command eq 'viewport') {
+    } elsif ($command eq 'viewport') {
         my ($viewName) = @arguments;
         if (defined($viewName)) {
             my $view = OpsView::Commands->viewport($connector, $viewName);
@@ -85,12 +81,17 @@ sub main {
             my $views = OpsView::Commands->viewport($connector);
             OpsView::Printer->printViews($views);
         }
-    }
-    # Host group
-    elsif ($command eq 'hostgroup') {
+    } elsif ($command eq 'hostgroup') {
         my ($groupId) = @arguments;
         my $groups = OpsView::Commands->hostgroup($connector, $groupId);
         OpsView::Printer->printHostGroups($groups, $groupId);
+    } elsif ($command eq 'host') {
+        my $hosts = OpsView::Commands->host($connector);
+        OpsView::Printer->printHosts($hosts);
+    } elsif ($command eq 'service') {
+        my ($host) = @arguments;
+        my $hosts = OpsView::Commands->service($connector, $host);
+        OpsView::Printer->printServices($hosts);
     } elsif ($command) {
         pod2usage("Unexpected command: $command");
     } else {

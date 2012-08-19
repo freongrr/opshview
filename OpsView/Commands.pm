@@ -1,6 +1,8 @@
 package OpsView::Commands;
 use strict;
 
+# TODO : perldoc?
+
 sub hostgroup {
     my ($class, $connector, $groupId) = @_;
 
@@ -26,6 +28,20 @@ sub viewport {
         return $connector->request('status/viewport/'.$viewName)->{'list'};
     } else {
         return $connector->request('status/viewport')->{'list'};
+    }
+}
+
+sub host {
+    my ($class, $connector, $hostname) = @_;
+    return $connector->request('status/host')->{'list'};
+}
+
+sub service {
+    my ($class, $connector, $hostname) = @_;
+    if (defined($hostname)) {
+        return $connector->request('status/service?host='.$hostname)->{'list'};
+    } else {
+        return $connector->request('status/service')->{'list'};
     }
 }
 

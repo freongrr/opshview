@@ -61,7 +61,7 @@ export HOST_CACHE=""
 function _opsView_complete_host() {
   local cur="$2" prev="$3"
   if [ "$HOST_CACHE" == "" ] ; then
-    HOST_CACHE=`opsview_hostlist`
+    HOST_CACHE=`opsview_host | tail -n +2 | cut -d' ' -f2`
   fi
   COMPREPLY=( $( compgen -W "$HOST_CACHE" -- "$cur" ) )
   return 0
@@ -105,7 +105,7 @@ for cmd in $OPSVIEW_COMMANDS ; do
   echo "}" >> $OPSVIEW_RC_FILE
 done
 
-echo "complete -F _opsView_complete_host opsview_services" >> $OPSVIEW_RC_FILE
+echo "complete -F _opsView_complete_host opsview_service" >> $OPSVIEW_RC_FILE
 echo "complete -F _opsView_complete_view opsview_viewport" >> $OPSVIEW_RC_FILE
 
 echo "PS1=\"[opshview ($opsViewUsername)] > \"" >> $OPSVIEW_RC_FILE
